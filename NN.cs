@@ -2,9 +2,8 @@ using UnityEngine
 
 public class NN: MonoBehaviour
 {
-    public Layer hidden1;
-    public Layer hidden2;
-    public Layer output;
+    public int [] networkShape = {2,4,4,2}
+    public Layer [] layers;
     public class Layer
     {
         public float[,] WeightsArray;
@@ -53,18 +52,40 @@ public class NN: MonoBehaviour
     }
     public void Awake()
     {
-        hidden1 = new Layer(2, 4);
-        hidden2 = new Layer(4, 4);
-        output = new Layer(4, 2);
+        layers = new Layer[networkShape.Length -1];
+        for(int 1= 0; int < layers.Length; i++)
+        {
+            layers[i] = new Layer(networkShape[i], networkShape[i+1]);
+        }
     }
 
     public float[] Brain(float [] inputs)
     {
+
         hidden1.Forward(inputs);
         hidden1.Activation();
         hidden2.Forward(hidden1.nodeArray);
         hidden2.Activation();
         output.Forward(hidden2.nodeArray);
+
+        for(int i = 0; i < layers.Length; i++)
+        {
+            if(i == 0)
+            {
+                layers[i].Forward(inputs);
+                layers[i].Activation();
+            }
+            else if(i == layers.Length - 1)
+            {
+                layers[i].Forward(layers[i - 1].nodeArray)
+            }
+            else
+            {
+                layers[i].Forward(layers[i - 1].nodeArray)
+                layers[i].Activation();
+            }
+            
+        }
 
         return(output.nodeArray);
     }
